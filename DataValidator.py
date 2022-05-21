@@ -19,6 +19,7 @@ class DataValidator():
     @staticmethod
     def validate_data(data, validations):
         try:
+            # validate data against the rules on the function stack
             for validation in validations:
                 validation(data)
             return None
