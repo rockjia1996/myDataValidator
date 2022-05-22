@@ -80,21 +80,3 @@ class NumberTypeValidation():
     def multiple(self, base, data):
         if data % base != 0:
             raise Exception(f"Error: not multiple of base {base}")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
