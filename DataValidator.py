@@ -1,46 +1,51 @@
 from StringTypeValidation import StringTypeValidation
+from NumberTypeValidation import NumberTypeValidation
 
 class DataValidator():
 
     @staticmethod
     def validate(schema, data):
         errors = {}
-
         for key, validations in schema.items():
-            error = DataValidator.validate_data(
-                data[key], 
-                validations.get_validations()
-            )
-            if isinstance(error, Exception):
+            error = validations.validate(data[key])
+            if len(error) != 0:
                 errors[key] = error
-
         return errors
-
-    @staticmethod
-    def validate_data(data, validations):
-        try:
-            # validate data against the rules on the function stack
-            for validation in validations:
-                validation(data)
-            return None
-        except Exception as error:
-            return error
 
 
 
 if __name__ == "__main__":
-    testSchema = {
-        "test1": StringTypeValidation().min(4).max(50).email(),
+    string_test_schema = {
+        "test1": StringTypeValidation().min(7).max(50).email(),
         "test2": StringTypeValidation().min(4).max(32).password(),
         "test3": StringTypeValidation().alphanum().min(4).max(32).lowercase()
     }
 
-
-    testData = {
+    string_test_data = {
         "test1": "yujia@domain.com",
         "test2": "$somePassword123@%&\\n",
-        "test3": "some test string 3"
+        "test3": "someteststring"
     }
 
-    errors = DataValidator.validate(testSchema, testData)
-    print(errors)
+    errors = DataValidator.validate(string_test_schema, string_test_data)
+    for key, val in errors.items():
+        print(f"key: {key}, val: {val}")
+
+
+    number_test_schema = {
+        "test1": NumberTypeValidation().min(10).max(100),
+        "test2": NumberTypeValidation().positive().min(100),
+        "test3": NumberTypeValidation().min(10).max(10000).multiple(2)
+    }
+
+    number_test_data = {
+        "test1": 23,
+        "test2": 150,
+        "test3": 222
+    }
+
+
+    errors = DataValidator.validate(number_test_schema, number_test_data)
+    for key, val in errors.items():
+        print(f"key: {key}, val: {val}")
+

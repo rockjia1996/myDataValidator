@@ -1,77 +1,85 @@
 import re
+from functools import partial
+
+# All the methods that handle the validations, that is all the current or 
+# future methods that will be annoted with decorator @append_queue, should 
+# construct its paramters in the following signature:
+#
+#   def some_method (self, arg1, arg2, ..., data, kwarg1=, ,kwarg2=, ...)
+# 
+# By following the above signature, the partial function can properly 
+# construct validation function with the given incomplete arguments.
 
 class NumberTypeValidation():
+
     def __init__(self):
-        self.validate_stack = []
+        self.errors = []
+        self.validation_queue = []
+        self.number()
 
-    # Get the pre-config rules
-    def get_validations(self):
-        return self.validate_stack
+    def validate(self, data):
+        for func in self.validation_queue:
+            try:
+                func(data)
+            except Exception as error:
+                self.errors.append(error)
+        return self.errors
 
-    # Add rule to the sequnce    
-    def add_validation(self, func):
-        self.validate_stack.append(func)
+    # wrapper function for contructing validations and appending to the queue
+    def append_queue(func):
+        def callable(self, *args, **kwargs):
+            validation_func = partial(func, self, *args, **kwargs)
+            self.validation_queue.append(validation_func)
+            return self
+        return callable
 
     # Validate number type
     # The method will be called when initializing the instance
-    def number(self):
-        def check_number(data):
-            if not isinstance(data, int) or not isinstance(data, float):
-                raise Exception(f"Error: not a number")
-        self.add_validation(check_number)
+    @append_queue
+    def number(self, data):
+        if not (isinstance(data, int) or isinstance(data, float)):
+            raise Exception(f"Error: not a number")
 
 
     # Validate the min value
-    def min(self, min_value):
-        def check_min(data):
-            if data < min_value:
-                raise Exception(f"Error: out of min bound")
-        self.add_validation(check_min)
-        return self
+    @append_queue
+    def min(self, min_value, data):
+        if data < min_value:
+            raise Exception(f"Error: out of min bound")
 
     # Validate the max value 
-    def max(self, max_value):
-        def check_max(data):
-            if data > max_value:
-                raise Exception(f"Error: out of max bound")
-        self.add_validation(max_value)
-        return self
+    @append_queue
+    def max(self, max_value, data):
+        if data > max_value:
+            raise Exception(f"Error: out of max bound")
 
 
     # Validate the matched value
-    def exact(self, exact_value):
-        def check_exact(data):
-            if data != exact_value:
-                raise Exception(f"Error: unmatched value")
-        self.add_validation(exact_value)
-        return self
+    @append_queue
+    def exact(self, exact_value, data):
+        if data != exact_value:
+            raise Exception(f"Error: unmatched value")
 
 
     # Validate the positive number
-    def positive(self):
-        def check_positive(data):
-            if data < 0:
-                raise Exception(f"Error: not positive value")
-        self.add_validation(check_positive)
-        return self
+    @append_queue
+    def positive(self, data):
+        if data < 0:
+            raise Exception(f"Error: not positive value")
 
 
     # Validate the negative number
-    def negative(self):
-        def check_negative(data):
-            if data > 0:
-                raise Exception(f"Error: not negative value")
-        self.add_validation(check_negative)
-        return self
+    @append_queue
+    def negative(self, data):
+        if data > 0:
+            raise Exception(f"Error: not negative value")
 
 
     # Validate the multiple of base
-    def multiple(self, base):
-        def check_multiple(data):
-            if data % base != 0:
-                raise Exception(f"Error: not multiple of base {base}")
-        self.add_validation(check_multiple)
-        return self
+    @append_queue
+    def multiple(self, base, data):
+        if data % base != 0:
+            raise Exception(f"Error: not multiple of base {base}")
 
 
 
