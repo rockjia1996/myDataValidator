@@ -10,7 +10,7 @@ from functools import partial
 # By following the above signature, the partial function can properly 
 # construct validation function with the given incomplete arguments.
 
-class StringTypeValidation():
+class StringType():
 
     def __init__(self):
         self.errors = []
@@ -126,4 +126,3 @@ class StringTypeValidation():
         for pattern in patterns:
             if not bool(re.compile(pattern).match(data)):
                 raise Exception(f"Error: unmatched pattern")
-
