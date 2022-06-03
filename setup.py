@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="pythong_data_validator",
-    pakcages=find_packages(include=['python-data-validator']),
+    pakcages=find_packages(include=['python_data_validator']),
     version="0.1.0",
     description="Python Data Validator",
     author="Yu Jia",
