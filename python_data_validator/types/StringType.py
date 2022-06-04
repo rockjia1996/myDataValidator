@@ -89,7 +89,13 @@ class StringType():
     # username_constraints and domain_constraints takes a list of regex to 
     # check against.
     @append_queue
-    def email(self, data, username_constraints=[], domain_constraints=[]):
+    def email(self, 
+        data, 
+        username_include_pattern=[], 
+        username_exclude_pattern=[],
+        domain_include_patterrn=[],
+        domain_exclude_pattern=[]):
+
         # Basic email pattern
         # 64 characters for username, 128 characters for domain name
         email_pattern = re.compile(r"^(\w{2,64})@(\w{2,64}\.\w{2,64})$")
@@ -101,15 +107,26 @@ class StringType():
         username = match_result.group(1)
         domain = match_result.group(2)
 
-        # Validate username against given username constraints
-        for constraint in username_constraints:
+        # Check if the username matches the include pattern
+        for constraint in username_include_pattern:
             if not bool(re.compile(constraint).match(username)):
-                raise Exception(f"Error: illegal username in email")
+                raise Exception(f"Error: username unmatch included pattern")
+
+        # Check if the username matches the exclude pattern
+        for constraint in username_exclude_pattern:
+            if bool(re.compile(constraint).match(username)):
+                raise Exception(f"Error: username match excluded pattern")
+
                 
-        # Validate domain against given domain constraints
-        for constraint in domain_constraints:
+        # Check if the domain matches the include pattern
+        for constraint in domain_include_patterrn:
             if not bool(re.compile(constraint).match(domain)):
-                raise Exception(f"Error: illegal domain in email")
+                raise Exception(f"Error: domain unmatch include pattern")
+
+        # Check if the domain matches the include pattern
+        for constraint in domain_exclude_pattern:
+            if bool(re.compile(constraint).match(domain)):
+                raise Exception(f"Error: domain unmatch include pattern")
 
 
     # Validate the password
