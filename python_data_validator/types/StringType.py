@@ -86,15 +86,8 @@ class StringType():
 
 
     # Validate if the email address is valid    
-    # username_constraints and domain_constraints takes a list of regex to 
-    # check against.
     @append_queue
-    def email(self, 
-        data, 
-        username_include_pattern=[], 
-        username_exclude_pattern=[],
-        domain_include_patterrn=[],
-        domain_exclude_pattern=[]):
+    def email(self, data):
 
         # Basic email pattern
         # 64 characters for username, 128 characters for domain name
@@ -106,28 +99,6 @@ class StringType():
 
         username = match_result.group(1)
         domain = match_result.group(2)
-
-        # Check if the username matches the include pattern
-        for constraint in username_include_pattern:
-            if not bool(re.compile(constraint).match(username)):
-                raise Exception(f"Error: username unmatch included pattern")
-
-        # Check if the username matches the exclude pattern
-        for constraint in username_exclude_pattern:
-            if bool(re.compile(constraint).match(username)):
-                raise Exception(f"Error: username match excluded pattern")
-
-                
-        # Check if the domain matches the include pattern
-        for constraint in domain_include_patterrn:
-            if not bool(re.compile(constraint).match(domain)):
-                raise Exception(f"Error: domain unmatch include pattern")
-
-        # Check if the domain matches the include pattern
-        for constraint in domain_exclude_pattern:
-            if bool(re.compile(constraint).match(domain)):
-                raise Exception(f"Error: domain unmatch include pattern")
-
 
     # Validate the password
     @append_queue
