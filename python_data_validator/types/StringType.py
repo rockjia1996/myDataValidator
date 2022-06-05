@@ -26,11 +26,27 @@ class StringType():
                 self.errors.append(error)
         return self.errors
 
+    # Credit: https://stackoverflow.com/questions/31728346/passing-default-arguments-to-a-decorator-in-python
+    def get_default_arguments(self, func):
+        signature = inspect.signature(func)
+        return {
+            k: v.default 
+            for k, v in signature.parameters.items()
+            if v.default is not inspect.Parameter.empty
+        }
+
 
     # wrapper function for contructing validations and appending to the queue
     def append_queue(func):
         def callable(self, *args, **kwargs):
-            validation_func = partial(func, self, *args, **kwargs)
+            # Get the default keyword arguments
+            kw_args = self.get_default_arguments(func)
+            # Update the default keyworad arguments with the provided 
+            # keyword arguments
+            kw_args.update(kwargs)
+
+            # Construct the partial function that ONLY missing the data argument
+            validation_func = partial(func, self, *args, **kw_args)
             self.validation_queue.append(validation_func)
             return self
         return callable
@@ -112,36 +128,57 @@ class StringType():
 
     # Validate based on the regex
     @append_queue
-    def pattern(self, data, match_all=[], match_any=[], match_none=[]):
-        print("match_all: ", match_all)
-        print("match_any: ", match_any)
-        print("match_none: ", match_none)
+    def pattern(self, data, match_all=None, match_any=None, match_none=None):
         
         # Check if match all the patterns
-        for pattern in match_all:
-            if not bool(re.compile(pattern).match(data)):
-                raise Exception(f"Error: unmatched the include pattern")
+        if isinstance(match_all, list):
+            for pattern in match_all:
+                if not bool(re.compile(pattern).match(data)):
+                    raise Exception(f"Error: unmatched the include pattern")
+        else:
+            raise Exception(f"Error: match_all argument should be a list of regex patterns")
 
         
         # Check if match if any the given patterns
-        any_match = False
-        for pattern in match_any:
-            print("hello")
-            if bool(re.compile(pattern).match(data)):
-                match_any = True
-                break
-        if any_match:
-            raise Exception(f"Error: unmatched any pattern")
+        if isinstance(match_any, list):
+            any_match = False
+            for pattern in match_any:
+                print("hello")
+                if bool(re.compile(pattern).match(data)):
+                    match_any = True
+                    break
+            if any_match:
+                raise Exception(f"Error: unmatched any pattern")
+        else:
+            raise Exception(f"Error: match_all argument should be a list of regex patterns")
 
         # Check if match any of excludsive pattern
-        for pattern in match_none:
-            if bool(re.compile(pattern).match(data)):
-                raise Exception(f"Error: match the exclude pattern")
+        if isinstance(match_none, list):
+            for pattern in match_none:
+                if bool(re.compile(pattern).match(data)):
+                    raise Exception(f"Error: match the exclude pattern")
+        else: 
+            raise Exception(f"Error: match_all argument should be a list of regex patterns")
+
+
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
-    schema = {"match_all": StringType().pattern(match_all=[r".*apple.*"], match_any=[], match_none=[]),}
-    matched_data = {"match_all": "apple"}
-    unmatched_data = {"match_all": "Something Watermelon Something",}
+    schema = {
+        "test_str": StringType().pattern(
+            match_all=[r"^www.*", r".*com$"], 
+            match_any=[], 
+            match_none=[r".*badsite.*", r".*scamsite.*"]),
+    
+    }
+    matched_data = {"test_str": "www.duckduckgo.com"}
+    unmatched_data = {"test_str": "www.googlebadsite.com" }
 
     def validate(schema, data):
         errors = {}
@@ -150,6 +187,8 @@ if __name__ == "__main__":
             if len(error) != 0:
                 errors[key] = error
         return errors
-    empty_errors = validate(schema, matched_data)
 
-    print(empty_errors)
+    empty_errors = validate(schema, matched_data)
+    errors = validate(schema, unmatched_data)
+    print("empty errors: ", empty_errors)
+    print("errors: ", errors)

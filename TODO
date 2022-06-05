@@ -1,4 +1,4 @@
-1. The append_queue decorator needs ot be capable to handle default arguments
-2. Redesign the append_queue.
+1. The append_queue decorator needs ot be capable to handle default arguments [x]
+2. Redesign the append_queue. [x]
 3. Test the redesign append_queue
 3. Finish the test on pattern method in StringType
