@@ -194,17 +194,34 @@ class TestStringTypeMethods(unittest.TestCase):
         self.assertIsInstance(errors["email_3"][0], Exception)
         self.assertIsInstance(errors["email_4"][0], Exception)
 
-'''
     def test_password(self):
-        pass
+        schema = {
+            "pass1": StringType().password(),
+            "pass2": StringType().password(),
+            "pass3": StringType().password(),
+        }
+        matched_data = {
+            "pass1": "1384973214971&^(*&^",
+            "pass2": "0380*&)(&123r2234*(Y",
+            "pass3": "^&(adfasdfe3r234"
+        }
+        unmatched_data = {
+            "pass1": "    passsword    ",
+            "pass2": "tab\t\tpassword",
+            "pass3": "pass world \n"
+        }
+
+        empty_errors = Validator.validate(schema, matched_data)
+        errors = Validator.validate(schema, unmatched_data)
+        self.assertEqual(empty_errors, {})
+
+        self.assertIsInstance(errors["pass1"][0], Exception)
+        self.assertIsInstance(errors["pass2"][0], Exception)
+        self.assertIsInstance(errors["pass3"][0], Exception)
 
 
     def test_pattern(self):
         pass
-
-
-'''
-
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import re
 from functools import partial
+import inspect
 
 # All the methods that handle the validations, that is all the current or 
 # future methods that will be annoted with decorator @append_queue, should 
@@ -24,6 +25,7 @@ class StringType():
             except Exception as error:
                 self.errors.append(error)
         return self.errors
+
 
     # wrapper function for contructing validations and appending to the queue
     def append_queue(func):
@@ -97,8 +99,8 @@ class StringType():
         if not bool(match_result):
             raise Exception(f"Error: not email address")
 
-        username = match_result.group(1)
-        domain = match_result.group(2)
+        #username = match_result.group(1)
+        #domain = match_result.group(2)
 
     # Validate the password
     @append_queue
@@ -110,7 +112,44 @@ class StringType():
 
     # Validate based on the regex
     @append_queue
-    def pattern(self, data, patterns=[]):
-        for pattern in patterns:
+    def pattern(self, data, match_all=[], match_any=[], match_none=[]):
+        print("match_all: ", match_all)
+        print("match_any: ", match_any)
+        print("match_none: ", match_none)
+        
+        # Check if match all the patterns
+        for pattern in match_all:
             if not bool(re.compile(pattern).match(data)):
-                raise Exception(f"Error: unmatched pattern")
+                raise Exception(f"Error: unmatched the include pattern")
+
+        
+        # Check if match if any the given patterns
+        any_match = False
+        for pattern in match_any:
+            print("hello")
+            if bool(re.compile(pattern).match(data)):
+                match_any = True
+                break
+        if any_match:
+            raise Exception(f"Error: unmatched any pattern")
+
+        # Check if match any of excludsive pattern
+        for pattern in match_none:
+            if bool(re.compile(pattern).match(data)):
+                raise Exception(f"Error: match the exclude pattern")
+
+if __name__ == "__main__":
+    schema = {"match_all": StringType().pattern(match_all=[r".*apple.*"], match_any=[], match_none=[]),}
+    matched_data = {"match_all": "apple"}
+    unmatched_data = {"match_all": "Something Watermelon Something",}
+
+    def validate(schema, data):
+        errors = {}
+        for key, validations in schema.items():
+            error = validations.validate(data[key])
+            if len(error) != 0:
+                errors[key] = error
+        return errors
+    empty_errors = validate(schema, matched_data)
+
+    print(empty_errors)
