@@ -1,7 +1,7 @@
 import unittest
 
-from python_data_validator.types.NumberType import NumberType
-from python_data_validator.validator.Validator import Validator
+from myDataValidator.types.NumberType import NumberType
+from myDataValidator.validator.Validator import Validator
 
 class TestNumberTypeValidations(unittest.TestCase):
 

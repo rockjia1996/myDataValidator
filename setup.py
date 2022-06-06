@@ -9,14 +9,13 @@ with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name="myDatavalidator",
-    packages=find_packages(include=['myDataValidator']),
+    name="myDataValidator",
     version="0.1.0",
+    packages=find_packages(),
     description="Python Data Validator",
     long_description=long_description,
     url="https://github.com/rockjia1996/myDataValidator",
     author="Yu Jia",
     author_email="rockjia1996@gmail.com",
     license="GNU General Public License v3.0",
-    install_requires=[]
 )

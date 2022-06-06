@@ -1,6 +1,6 @@
 import re
 
-from python_data_validator.types.DataType import DataType
+from myDataValidator.types.DataType import DataType
 
 # All the methods that handle the validations, that is all the current or 
 # future methods that will be annoted with decorator @append_queue, should 

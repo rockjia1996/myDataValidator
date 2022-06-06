@@ -1,7 +1,7 @@
 import unittest
 import re
-from python_data_validator.validator.Validator import Validator
-from python_data_validator.types.StringType import StringType
+from myDataValidator.validator.Validator import Validator
+from myDataValidator.types.StringType import StringType
 
 class TestStringTypeMethods(unittest.TestCase):
 
