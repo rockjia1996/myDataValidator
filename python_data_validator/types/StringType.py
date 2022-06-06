@@ -1,6 +1,6 @@
 import re
-from functools import partial
-import inspect
+
+from python_data_validator.types.DataType import DataType
 
 # All the methods that handle the validations, that is all the current or 
 # future methods that will be annoted with decorator @append_queue, should 
@@ -11,92 +11,57 @@ import inspect
 # By following the above signature, the partial function can properly 
 # construct validation function with the given incomplete arguments.
 
-class StringType():
+class StringType(DataType):
 
     def __init__(self):
-        self.errors = []
-        self.validation_queue = []
+        super().__init__()
         self.string()
-
-    def validate(self, data):
-        for func in self.validation_queue:
-            try:
-                func(data)
-            except Exception as error:
-                self.errors.append(error)
-        return self.errors
-
-    # Credit: https://stackoverflow.com/questions/31728346/passing-default-arguments-to-a-decorator-in-python
-    def get_default_arguments(self, func):
-        signature = inspect.signature(func)
-        return {
-            k: v.default 
-            for k, v in signature.parameters.items()
-            if v.default is not inspect.Parameter.empty
-        }
-
-
-    # wrapper function for contructing validations and appending to the queue
-    def append_queue(func):
-        def callable(self, *args, **kwargs):
-            # Get the default keyword arguments
-            kw_args = self.get_default_arguments(func)
-            # Update the default keyworad arguments with the provided 
-            # keyword arguments
-            kw_args.update(kwargs)
-
-            # Construct the partial function that ONLY missing the data argument
-            validation_func = partial(func, self, *args, **kw_args)
-            self.validation_queue.append(validation_func)
-            return self
-        return callable
-
 
     # Validate string type 
     # The method will be called when initializing the instance
-    @append_queue
+    @DataType.append_queue
     def string(self, data):
         if not isinstance(data, str):
             raise Exception(f"Error : not string type")
 
     # Validate if the number of characters are out of lower bound
-    @append_queue
+    @DataType.append_queue
     def min(self, min_value, data):
         if len(data) < min_value: 
             raise Exception(f"Error : out of min bound") 
 
     # Validate if the number of characters are out of higher bound
-    @append_queue
+    @DataType.append_queue
     def max(self, max_value, data):
         if len(data) > max_value:
             raise Exception(f"Error: out of max bound")
 
     # Validate if the number of characters are exact
-    @append_queue
+    @DataType.append_queue
     def length(self, length, data):
         if len(data) != length:
             raise Exception(f"Error: unmatched length")
 
     # Validate if all the characters are uppercase
-    @append_queue
+    @DataType.append_queue
     def uppercase(self, data):
         if not data.isupper():
             raise Exception(f"Error: not all uppercase")
 
     # Validate if all the characters are lowercase
-    @append_queue
+    @DataType.append_queue
     def lowercase(self, data):
         if not data.islower():
             raise Exception(f"Error: not all lowercase")
 
     # Validate if all the characters are alphanumeric
-    @append_queue
+    @DataType.append_queue
     def alphanum(self, data):
         if not data.isalnum():
             raise Exception(f"Error: not all alphanumeric")
 
     # Validate if the string is a hex string
-    @append_queue
+    @DataType.append_queue
     def hex(self, data):
         hex_pattern = re.compile(r"^0x[0-9a-fA-F]+")
         if not bool(hex_pattern.match(data)):
@@ -104,7 +69,7 @@ class StringType():
 
 
     # Validate if the email address is valid    
-    @append_queue
+    @DataType.append_queue
     def email(self, data):
 
         # Basic email pattern
@@ -119,7 +84,7 @@ class StringType():
         #domain = match_result.group(2)
 
     # Validate the password
-    @append_queue
+    @DataType.append_queue
     def password(self, data):
         password_pattern = re.compile(r"\S+")
         if not bool(password_pattern.fullmatch(data)):
@@ -127,7 +92,7 @@ class StringType():
 
 
     # Validate based on the regex
-    @append_queue
+    @DataType.append_queue
     def pattern(self, data, match_all=None, match_any=None, match_none=None):
         
         # Check if match all the patterns
