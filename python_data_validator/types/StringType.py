@@ -143,11 +143,10 @@ class StringType():
         if isinstance(match_any, list):
             any_match = False
             for pattern in match_any:
-                print("hello")
                 if bool(re.compile(pattern).match(data)):
-                    match_any = True
+                    any_match = True
                     break
-            if any_match:
+            if not any_match:
                 raise Exception(f"Error: unmatched any pattern")
         else:
             raise Exception(f"Error: match_all argument should be a list of regex patterns")
@@ -169,26 +168,3 @@ class StringType():
 
 
 
-if __name__ == "__main__":
-    schema = {
-        "test_str": StringType().pattern(
-            match_all=[r"^www.*", r".*com$"], 
-            match_any=[], 
-            match_none=[r".*badsite.*", r".*scamsite.*"]),
-    
-    }
-    matched_data = {"test_str": "www.duckduckgo.com"}
-    unmatched_data = {"test_str": "www.googlebadsite.com" }
-
-    def validate(schema, data):
-        errors = {}
-        for key, validations in schema.items():
-            error = validations.validate(data[key])
-            if len(error) != 0:
-                errors[key] = error
-        return errors
-
-    empty_errors = validate(schema, matched_data)
-    errors = validate(schema, unmatched_data)
-    print("empty errors: ", empty_errors)
-    print("errors: ", errors)

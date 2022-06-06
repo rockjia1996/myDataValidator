@@ -221,7 +221,33 @@ class TestStringTypeMethods(unittest.TestCase):
 
 
     def test_pattern(self):
-        pass
+        schema = {
+            "website": StringType().pattern(
+                match_all=[r"^www\..*", r".*\.com$"], 
+                match_any=[r".*google.*", r".*youtube.*"], 
+                match_none=[r".*badsite.*", r".*scamsite.*"]),
+            "email": StringType().pattern(
+                match_all=[r"\w+@\w+\.com"], 
+                match_any=[r".*google.*", r".*gmail.*"], 
+                match_none=[r".*domain.*", r".*scam.*"]
+            )
+        }
+        matched_data = {
+            "website": "www.google.com",
+            "email": "someUser@gmail.com"
+            
+        }
+        unmatched_data = {
+            "website": "www.scams.com",
+            "email": "someUser@yahoo.com"    
+        }
+
+        empty_errors = Validator.validate(schema, matched_data)
+        errors = Validator.validate(schema, unmatched_data)
+
+        self.assertIsInstance(errors["website"][0], Exception)
+        self.assertIsInstance(errors["email"][0], Exception)
+        
 
 
 if __name__ == "__main__":
