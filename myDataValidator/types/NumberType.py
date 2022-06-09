@@ -1,4 +1,5 @@
 from myDataValidator.types.DataType import DataType
+from myDataValidator.exceptions.ValidationError import ValidationError
 
 # All the methods that handle the validations, that is all the current or 
 # future methods that will be annoted with decorator @append_queue, should 
@@ -20,45 +21,42 @@ class NumberType(DataType):
     @DataType.append_queue
     def number(self, data):
         if not (isinstance(data, int) or isinstance(data, float)):
-            raise Exception(f"Error: not a number")
+            raise ValidationError("NUMBER_ERROR", "not number type")
 
 
     # Validate the min value
     @DataType.append_queue
     def min(self, min_value, data):
         if data < min_value:
-            raise Exception(f"Error: out of min bound")
+            raise ValidationError("MIN_ERROR", "min out of bound")
 
     # Validate the max value 
     @DataType.append_queue
     def max(self, max_value, data):
         if data > max_value:
-            raise Exception(f"Error: out of max bound")
+            raise ValidationError("MAX_ERROR", "max out of bound")
 
 
     # Validate the matched value
     @DataType.append_queue
     def exact(self, exact_value, data):
         if data != exact_value:
-            raise Exception(f"Error: unmatched value")
-
+            raise ValidationError("EXACT_ERROR", "exact unmatched")
 
     # Validate the positive number
     @DataType.append_queue
     def positive(self, data):
         if data < 0:
-            raise Exception(f"Error: not positive value")
-
+            raise ValidationError("POSITIVE_ERROR", "not positive")
 
     # Validate the negative number
     @DataType.append_queue
     def negative(self, data):
         if data > 0:
-            raise Exception(f"Error: not negative value")
-
+            raise ValidationError("NEGATIVE_ERROR", "not negative")
 
     # Validate the multiple of base
     @DataType.append_queue
     def multiple(self, base, data):
         if data % base != 0:
-            raise Exception(f"Error: not multiple of base {base}")
+            raise ValidationError("MULTIPLE_ERROR", "not the multiple of the base")
