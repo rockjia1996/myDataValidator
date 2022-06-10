@@ -1,6 +1,7 @@
 import re
 
 from myDataValidator.types.DataType import DataType
+from myDataValidator.exceptions.ValidationError import ValidationError
 
 # All the methods that handle the validations, that is all the current or 
 # future methods that will be annoted with decorator @append_queue, should 
@@ -22,50 +23,50 @@ class StringType(DataType):
     @DataType.append_queue
     def string(self, data):
         if not isinstance(data, str):
-            raise Exception(f"Error : not string type")
+            raise ValidationError("STRING_ERROR", "not string type")
 
     # Validate if the number of characters are out of lower bound
     @DataType.append_queue
     def min(self, min_value, data):
         if len(data) < min_value: 
-            raise Exception(f"Error : out of min bound") 
+            raise ValidationError("MIN_ERROR", "not min bound")
 
     # Validate if the number of characters are out of higher bound
     @DataType.append_queue
     def max(self, max_value, data):
         if len(data) > max_value:
-            raise Exception(f"Error: out of max bound")
+            raise ValidationError("MAX_ERROR", "out max bound")
 
     # Validate if the number of characters are exact
     @DataType.append_queue
     def length(self, length, data):
         if len(data) != length:
-            raise Exception(f"Error: unmatched length")
+            raise ValidationError("LENGTH_ERROR", "unmatched length")
 
     # Validate if all the characters are uppercase
     @DataType.append_queue
     def uppercase(self, data):
         if not data.isupper():
-            raise Exception(f"Error: not all uppercase")
+            raise ValidationError("UPPERCASE_ERROR", "not all uppercase")
 
     # Validate if all the characters are lowercase
     @DataType.append_queue
     def lowercase(self, data):
         if not data.islower():
-            raise Exception(f"Error: not all lowercase")
+            raise ValidationError("LOWERCASE_ERROR", "not all lowercase")
 
     # Validate if all the characters are alphanumeric
     @DataType.append_queue
     def alphanum(self, data):
         if not data.isalnum():
-            raise Exception(f"Error: not all alphanumeric")
+            raise ValidationError("ALPHANUM_ERROR", "not all alphanumeric")
 
     # Validate if the string is a hex string
     @DataType.append_queue
     def hex(self, data):
         hex_pattern = re.compile(r"^0x[0-9a-fA-F]+")
         if not bool(hex_pattern.match(data)):
-            raise Exception(f"Error: not hex string")
+            raise ValidationError("HEX_ERROR", "not hex string")
 
 
     # Validate if the email address is valid    
@@ -78,7 +79,7 @@ class StringType(DataType):
 
         match_result = email_pattern.fullmatch(data)
         if not bool(match_result):
-            raise Exception(f"Error: not email address")
+            raise ValidationError("EMAIL_ERROR", "not email address")
 
         #username = match_result.group(1)
         #domain = match_result.group(2)
@@ -88,7 +89,7 @@ class StringType(DataType):
     def password(self, data):
         password_pattern = re.compile(r"\S+")
         if not bool(password_pattern.fullmatch(data)):
-            raise Exception(f"Error: illegal password")
+            raise ValidationError("PASSWORD_ERROR", "illegal password")
 
 
     # Validate based on the regex
@@ -99,9 +100,9 @@ class StringType(DataType):
         if isinstance(match_all, list):
             for pattern in match_all:
                 if not bool(re.compile(pattern).match(data)):
-                    raise Exception(f"Error: unmatched the include pattern")
+                    raise ValidationError("PATTERN_ERROR", "unmatched the include pattern")
         else:
-            raise Exception(f"Error: match_all argument should be a list of regex patterns")
+            raise ValidationError("PATTERN_ARGS_ERROR", "match_all argument should be a list of regex patterns")
 
         
         # Check if match if any the given patterns
@@ -112,24 +113,17 @@ class StringType(DataType):
                     any_match = True
                     break
             if not any_match:
-                raise Exception(f"Error: unmatched any pattern")
+                raise ValidationError("PATTERN_ERROR", "unmatched any pattern")
         else:
-            raise Exception(f"Error: match_all argument should be a list of regex patterns")
+            raise ValidationError("PATTERN_ARGS_ERROR", "match_any argument should be a list of regex patterns")
 
         # Check if match any of excludsive pattern
         if isinstance(match_none, list):
             for pattern in match_none:
                 if bool(re.compile(pattern).match(data)):
-                    raise Exception(f"Error: match the exclude pattern")
+                    raise ValidationError("PATTERN_ERROR", "unmatched exclude pattern")
         else: 
-            raise Exception(f"Error: match_all argument should be a list of regex patterns")
-
-
-
-
-
-
-
+            raise ValidationError("PATTERN_ARGS_ERROR", "match_none argument should be a list of regex patterns")
 
 
 
