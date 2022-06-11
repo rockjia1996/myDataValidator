@@ -10,3 +10,45 @@ In the future, there may have more extensions on functionalities. The extensions
 |-------------------|-----------------------------:|
 | StringType        |     General string type data |
 | NumberType        |  General numerical type data |     
+
+
+
+## Usage
+The validation process is a schema base process. The validation is composited by three components: schema, validator and data. Schema should be a dictonary object. There is no restriction on the keys of the dictionary, but the values need to be the support data type. 
+
+```python
+schema = {
+    'email': StringType().email(),
+    'password': StringType().password(),
+    'birth_year': NumberType().min(1950).max(2022)
+}
+```
+
+Here, we create two instances of StringType class and one instance of NumberType. By invoking the method email() on the StringType instance, we push the validation function that designed to handle email validations in StringType to this instance's validation queue. Validation queue of this instance is a queue that contains one or more validation functions that designed to handle different specifications that user specifies. For example:
+```python
+schema = {
+    'username': StringType().min(2).max(32).alphanum()
+}
+```
+The example above, we specify a schema for validating 'username'. min() specifies minimum characters of the string needs to be 2, max() specifies maximum characters of the string tops at 32, alphanum() specifies the characters in the string only can be alphabets or digits.
+
+To valiate, data and validator are both required:
+
+```python
+schema = {
+    'email': StringType().email(),
+    'password': StringType().password(),
+    'birth_year': NumberType().min(1950).max(2022)
+}
+
+data = {
+    'email: 'someuser@domain.com',
+    'password': '123abc',
+    'birth_year': 2000
+}
+
+Validator.validate(schema, data)
+```
+
+Here, we created a dictonary named data, and data has the same key as schema, then we pass schema and data to Validator.validate() to validate based on the requirements that we specified earlier.
+
