@@ -71,7 +71,7 @@ class StringType(DataType):
 
     # Validate if the email address is valid    
     @DataType.append_queue
-    def email(self, data):
+    def email(self, data, domain_patterns=None):
 
         # Basic email pattern
         # 64 characters for username, 128 characters for domain name
@@ -82,7 +82,21 @@ class StringType(DataType):
             raise ValidationError("EMAIL_ERROR", "not email address")
 
         #username = match_result.group(1)
-        #domain = match_result.group(2)
+        domain = match_result.group(2)
+
+        if domain_patterns == None: return 
+
+        if not isinstance(domain_patterns, list):
+            raise ValidationError("EMAIL_ARGS_ERROR", "domain_patterns needs to be a list of regex")
+
+        match_any = False
+        for pattern in domain_patterns:
+            if bool(re.compile(pattern).fullmatch(domain)):
+                match_any = True
+                break
+        if not match_any:
+            raise ValidationError("EMAIL_DOMAIN_ERRORS", "domain name missed matched")
+
 
     # Validate the password
     @DataType.append_queue
