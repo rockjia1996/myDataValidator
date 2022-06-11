@@ -47,8 +47,17 @@ data = {
     'birth_year': 2000
 }
 
-Validator.validate(schema, data)
+errors = Validator.validate(schema, data)
 ```
 
-Here, we created a dictonary named data, and data has the same key as schema, then we pass schema and data to Validator.validate() to validate based on the requirements that we specified earlier.
+Here, we created a dictonary named data, and data must has the same key as schema, then we pass schema and data to Validator.validate() to validate based on the requirements that we specified earlier. If nothing goes wrong, the Validator.validate() should return an empty dictionary. errors will be popluated with the entry that fails the validation. If we only have 'email' entry fails the validation, it looks like something like this:
+
+```python
+errors = {
+    'email': [ValidationError("EMAIL_ERROR", "not email address")]
+}
+```
+
+If the validations fail, it returns the corresponding key with a list of ValidationError. ValidationError object has two methods, get_error_tag() for getting the error tags, get_error_message() for getting the error message.
+
 
