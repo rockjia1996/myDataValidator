@@ -115,7 +115,8 @@ class StringType(DataType):
             for pattern in match_all:
                 if not bool(re.compile(pattern).match(data)):
                     raise ValidationError("PATTERN_ERROR", "unmatched the include pattern")
-        else:
+
+        if match_all == None or isinstance(match_all, list):
             raise ValidationError("PATTERN_ARGS_ERROR", "match_all argument should be a list of regex patterns")
 
         
@@ -128,7 +129,8 @@ class StringType(DataType):
                     break
             if not any_match:
                 raise ValidationError("PATTERN_ERROR", "unmatched any pattern")
-        else:
+
+        if match_any == None or isinstance(match_any, list):
             raise ValidationError("PATTERN_ARGS_ERROR", "match_any argument should be a list of regex patterns")
 
         # Check if match any of excludsive pattern
@@ -136,7 +138,8 @@ class StringType(DataType):
             for pattern in match_none:
                 if bool(re.compile(pattern).match(data)):
                     raise ValidationError("PATTERN_ERROR", "unmatched exclude pattern")
-        else: 
+
+        if match_none == None or isinstance(match_none, list):
             raise ValidationError("PATTERN_ARGS_ERROR", "match_none argument should be a list of regex patterns")
 
 
