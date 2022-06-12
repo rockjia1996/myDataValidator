@@ -167,7 +167,7 @@ class TestStringTypeMethods(unittest.TestCase):
     def test_email(self):
         schema = {
             "email_1": StringType().email(),
-            "email_2": StringType().email(),
+            "email_2": StringType().email(domain_patterns = [r".*\.edu", r".*\.co"]),
             "email_3": StringType().email(),
             "email_4": StringType().email(),
         }
@@ -193,6 +193,9 @@ class TestStringTypeMethods(unittest.TestCase):
         self.assertIsInstance(errors["email_2"][0], Exception)
         self.assertIsInstance(errors["email_3"][0], Exception)
         self.assertIsInstance(errors["email_4"][0], Exception)
+
+
+
 
     def test_password(self):
         schema = {
