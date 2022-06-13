@@ -194,7 +194,18 @@ class TestStringTypeMethods(unittest.TestCase):
         self.assertIsInstance(errors["email_3"][0], Exception)
         self.assertIsInstance(errors["email_4"][0], Exception)
 
+        # test domain name contraints
+        schema = {
+            "email": StringType().email(
+                domain_patterns=[r'.*\.com', r'.*\.edu', r'.*\.org']
+            )}
+        data           = {"email": 'user@gmail.com'}
+        unmatched_data = {"email": "user@fire.io"}
+        empty_errors  = Validator.validate(schema, data)
+        errors  = Validator.validate(schema, unmatched_data)
 
+        self.assertEqual(empty_errors, {})
+        self.assertIsInstance(errors["email"][0], Exception)
 
 
     def test_password(self):
